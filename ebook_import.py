@@ -120,14 +120,14 @@ def process_file(file_path):
     ])
     
     # get imported book id from output
-    book_id = re.search(r"Added book ids: (\d+)", output).group(1).strip()
-    
-    if not success or "Added book ids" not in output:
+    match = re.search(r"Added book ids: (\d+)", output)
+    if not success or not match:
         print(f"Failed to add book, moving book to failed directory: {filename}")
         output_path = os.path.join(f"{OUTPUT_DIR}/failed", filename)
         shutil.move(file_path, output_path)
         return
     
+    book_id = match.group(1).strip()
     meta = epub_info(file_path)
     title = meta.get("title", title)
     author = meta.get("creator", author)
