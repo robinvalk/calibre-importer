@@ -12,6 +12,16 @@ LIBRARY_DIR = "/mnt/library"
 CALIBREDB = "/opt/calibre/calibredb"
 FETCH_BOOK_METADATA = "/opt/calibre/fetch-ebook-metadata"
 
+def ensure_directories_exist():
+    directories = [
+        f"{OUTPUT_DIR}/failed",
+        f"{OUTPUT_DIR}/skipped",
+        f"{OUTPUT_DIR}/imported"
+    ]
+    for directory in directories:
+        os.makedirs(directory, exist_ok=True)
+    print("Ensured all necessary directories exist.")
+
 def epub_info(fname):
     def xpath(element, path):
         return element.xpath(
@@ -31,7 +41,7 @@ def epub_info(fname):
         cfname = xpath(
             etree.fromstring(zip_content.read("META-INF/container.xml")),
             "n:rootfiles/n:rootfile/@full-path",
-        ) 
+        )
         
         # grab the metadata block from the contents metafile
         metadata = xpath(
@@ -42,7 +52,7 @@ def epub_info(fname):
         return {
             s: xpath(metadata, f"dc:{s}/text()")
             for s in ("title", "language", "creator", "date", "identifier")
-        }  
+        }
     except zipfile.BadZipFile:
         return {}
     except IndexError:
@@ -163,6 +173,7 @@ def process_file(file_path):
     print(f"Processed and moved: {file_path}")
 
 def main():
+    ensure_directories_exist()
     processed_files = set()
     
     while True:
