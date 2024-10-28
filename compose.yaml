@@ -1,0 +1,29 @@
+services:
+  calibre-importer:
+    build: .
+    container_name: calibre-importer
+    volumes:
+      - ./volumes/input:/mnt/input
+      - ./volumes/library:/mnt/library
+      - ./volumes/output:/mnt/output
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - CALIBRE_OVERRIDE_LANG=en
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - ./volumes/config:/config
+      - ./volumes/library:/books
+    ports:
+      - 8083:8083
+    restart: unless-stopped
