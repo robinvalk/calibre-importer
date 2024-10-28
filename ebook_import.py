@@ -109,7 +109,6 @@ def process_file(file_path):
         output_path = os.path.join(f"{OUTPUT_DIR}/skipped", filename)
         shutil.move(file_path, output_path)
         return
-    
     # Import book with title and author
     success, output = run_calibre_command([
         CALIBREDB, "add",
@@ -123,6 +122,7 @@ def process_file(file_path):
     match = re.search(r"Added book ids: (\d+)", output)
     if not success or not match:
         print(f"Failed to add book, moving book to failed directory: {filename}")
+        print(f"Calibre output: \n{output}")  # Log the output if import failed
         output_path = os.path.join(f"{OUTPUT_DIR}/failed", filename)
         shutil.move(file_path, output_path)
         return
